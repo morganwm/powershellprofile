@@ -1,17 +1,20 @@
-Set-Location -Path "C:\"
+#Set-Location -Path "C:\"
 #. ((Split-Path -Path (Get-Module -Name posh-git -ListAvailable).Path -Parent)+"\profile.example.ps1")
 Import-Module posh-git
 
+<#
+
 function Set-ConsoleOpacity {
     param(
-        [ValidateRange(10,100)]
+        [ValidateRange(10, 100)]
         [int]$Opacity
     )
 
     # Check if pinvoke type already exists, if not import the relevant functions
     try {
         $Win32Type = [Win32.WindowLayer]
-    } catch {
+    }
+    catch {
         $Win32Type = Add-Type -MemberDefinition @'
             [DllImport("user32.dll")]
             public static extern int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
@@ -32,28 +35,30 @@ function Set-ConsoleOpacity {
     $WindowHandle = $ThisProcess.MainWindowHandle
 
     # "Constants"
-    $GwlExStyle  = -20;
+    $GwlExStyle = -20;
     $WsExLayered = 0x80000;
-    $LwaAlpha    = 0x2;
+    $LwaAlpha = 0x2;
 
-    if($Win32Type::GetWindowLong($WindowHandle,-20) -band $WsExLayered -ne $WsExLayered){
+    if ($Win32Type::GetWindowLong($WindowHandle, -20) -band $WsExLayered -ne $WsExLayered) {
         # If Window isn't already marked "Layered", make it so
-        [void]$Win32Type::SetWindowLong($WindowHandle,$GwlExStyle,$Win32Type::GetWindowLong($WindowHandle,$GwlExStyle) -bxor $WsExLayered)
+        [void]$Win32Type::SetWindowLong($WindowHandle, $GwlExStyle, $Win32Type::GetWindowLong($WindowHandle, $GwlExStyle) -bxor $WsExLayered)
     }
 
     # Set transparency
-    [void]$Win32Type::SetLayeredWindowAttributes($WindowHandle,0,$OpacityValue,$LwaAlpha)
+    [void]$Win32Type::SetLayeredWindowAttributes($WindowHandle, 0, $OpacityValue, $LwaAlpha)
 }
 
+#>
+
 function Global:Set-Title {
-    
+
     if ($Host.Name -match "console") {
         #$MaxHeight = $host.UI.RawUI.MaxPhysicalWindowSize.Height
         #$MaxWidth = $host.UI.RawUI.MaxPhysicalWindowSize.Width
 
         #$MyBuffer = $Host.UI.RawUI.BufferSize
         #$MyWindow = $Host.UI.RawUI.WindowSize
-    
+
         #$MyWindow.Height = ($MaxHeight)
         #$MyWindow.Width = ($Maxwidth-2)
 
@@ -62,7 +67,7 @@ function Global:Set-Title {
 
         #$host.UI.RawUI.set_bufferSize($MyBuffer)
         #$host.UI.RawUI.set_windowSize($MyWindow)
-            
+
 
 
        }
@@ -70,9 +75,9 @@ function Global:Set-Title {
     $CurrentUser = [Security.Principal.WindowsIdentity]::GetCurrent()
     $CurrentUserPrincipal = New-Object Security.Principal.WindowsPrincipal $CurrentUser
     $Adminrole = [Security.Principal.WindowsBuiltinRole]::Administrator
-    If (($CurrentUserPrincipal).IsInRole($AdminRole)){$Elevated = "Administrator"}    
-    
-    $Title = $Elevated + " $ENV:USERNAME".ToUpper() + ": $($Host.Name) "  + " - " + (Get-Date).toshortdatestring() 
+    If (($CurrentUserPrincipal).IsInRole($AdminRole)){$Elevated = "Administrator"}
+
+    $Title = $Elevated + " $ENV:USERNAME".ToUpper() + ": $($Host.Name) "  + " - " + (Get-Date).toshortdatestring()
     $Host.UI.RawUI.set_WindowTitle($Title)
 
 }
@@ -147,4 +152,3 @@ function Enter-ElevatedPSSession {
 New-Alias -Name su -Value Enter-ElevatedPSSession
 
 Set-Title
-Set-ConsoleOpacity -Opacity 92
