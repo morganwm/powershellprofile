@@ -72,7 +72,7 @@ function Global:Set-Title {
     $Adminrole = [Security.Principal.WindowsBuiltinRole]::Administrator
     If (($CurrentUserPrincipal).IsInRole($AdminRole)){$Elevated = "Administrator"}    
     
-    $Title = $Elevated + " $ENV:USERNAME".ToUpper() + ": $($Host.Name) " + $($Host.Version) + " - " + (Get-Date).toshortdatestring() 
+    $Title = $Elevated + " $ENV:USERNAME".ToUpper() + ": $($Host.Name) "  + " - " + (Get-Date).toshortdatestring() 
     $Host.UI.RawUI.set_WindowTitle($Title)
 
 }
