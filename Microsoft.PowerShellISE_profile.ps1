@@ -1,2 +1,2 @@
 Import-Module posh-git
-Set-Location C:\
+#Set-Location C:\
